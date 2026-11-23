@@ -173,7 +173,7 @@ for node in ${worker_node_array[@]}; do
         echo "$node already joined to Kubernetes cluster"
     else
         echo "Joining $node to cluster..."
-        run_ssh_command $node "$kube_join_cmd"
+        run_ssh_command $node "sudo $kube_join_cmd"
     fi
 done
 
