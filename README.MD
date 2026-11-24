@@ -26,7 +26,7 @@ The provisioning script creates a role for our imaginary summer intern named Joh
     
     `control_node`, `worker_nodes`, `ssh_user`, and `ssh_key_path` will need to be edited from defaults, other settings will function as is and are provided for customization.
 
-3. `cd kube-deploy/cluster`
+3. `cd t-eval/kube-deploy/cluster`
 4. Run `.cluster-provision.sh`
 
 ### Johnny Instructions
