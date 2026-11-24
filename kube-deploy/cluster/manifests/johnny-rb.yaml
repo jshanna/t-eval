@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: johnny-d-sa:johnny
+  namespace: johnny-droptables
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: johnny
+subjects:
+  - kind: ServiceAccount
+    name: johnny-d-sa
+    namespace: johnny-droptables

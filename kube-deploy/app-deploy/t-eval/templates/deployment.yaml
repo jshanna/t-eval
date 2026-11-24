@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "t-eval.fullname" . }}
+  name: awesomeapp
   labels:
     {{- include "t-eval.labels" . | nindent 4 }}
 spec:
