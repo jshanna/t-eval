@@ -215,17 +215,16 @@ run_ssh_command ${config[control_node]} "printf \"apiVersion: metallb.io/v1beta1
 run_ssh_command ${config[control_node]} "kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${config[gateway_api_version]}/${config[gateway_api_stream]}-install.yaml"
 
 ## Install Kgateway
-sftp_put ${config[control_node]} "./manifests/ap-gateway.yaml" "/home/${config[ssh_user]}"
-sftp_put ${config[control_node]} "./manifests/ap-http-redirect.yaml" "/home/${config[ssh_user]}"
+sftp_put ${config[control_node]} "./manifests/api-gateway.yaml" "/home/${config[ssh_user]}"
+sftp_put ${config[control_node]} "./manifests/api-http-redirect.yaml" "/home/${config[ssh_user]}"
 run_ssh_command ${config[control_node]} "kubectl create namespace kgateway-system"
 run_ssh_command ${config[control_node]} "helm upgrade -i kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds --namespace kgateway-system --version ${config[kgateway_version]}"
 run_ssh_command ${config[control_node]} "helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --namespace kgateway-system --version ${config[kgateway_version]} --set agentgateway.enabled=false --set controller.image.pullPolicy=Always --wait --timeout 5m"
 run_ssh_command ${config[control_node]} "kubectl wait --namespace kgateway-system --for=condition=ready pod --selector=app.kubernetes.io/name=kgateway --timeout=300s"
 run_ssh_command ${config[control_node]} "kubectl apply -f api-gateway.yaml"
-run_ssh_command ${config[control_node]} "kubectl apply -f api-http-redirect.yaml"
 
 # Install Cert Manager
-run_ssh_command ${config[control_node]} "helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version ${config[cert_manager_version]} --namespace cert-manager --create-namespace --set crds.enabled=true"
+run_ssh_command ${config[control_node]} "helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version ${config[cert_manager_version]} --namespace cert-manager --create-namespace --set crds.enabled=true --set config.apiVersion="controller.config.cert-manager.io/v1alpha1" --set config.kind="ControllerConfiguration" --set config.enableGatewayAPI=true"
 run_ssh_command ${config[control_node]} "kubectl wait --namespace cert-manager --for=condition=ready pod --selector=app=cert-manager --timeout=300s"
 
 ## Create Cluster Issuer/CA Cert
@@ -245,6 +244,7 @@ sftp_put ${config[control_node]} "./manifests/johnny-token.yaml" "/home/${config
 sftp_put ${config[control_node]} "./manifests/kubeconfig.template" "/home/${config[ssh_user]}"
 
 run_ssh_command ${config[control_node]} "kubectl create namespace johnny-droptables"
+run_ssh_command ${config[control_node]} "kubectl apply -f api-http-redirect.yaml"
 run_ssh_command ${config[control_node]} "kubectl apply -f johnny-role.yaml"
 run_ssh_command ${config[control_node]} "kubectl apply -f johnny-sa.yaml"
 run_ssh_command ${config[control_node]} "kubectl apply -f johnny-rb.yaml"
@@ -253,3 +253,6 @@ run_ssh_command ${config[control_node]} "kubectl apply -f johnny-token.yaml"
 johnny_token=$(run_ssh_command ${config[control_node]} "kubectl get secret johnny-not-secure-token -n johnny-droptables -o jsonpath='{.data.token}' | base64 --decode")
 run_ssh_command ${config[control_node]} "sed \"s/<CP_IP>/${config[control_node]}/g\" kubeconfig.template > .kube/johnny.config"
 run_ssh_command ${config[control_node]} "sed -i \"s/<TOKEN>/$johnny_token/g\" .kube/johnny.config"
+
+# Put helm chart on control-node
+sftp_put ${config[control_node]} "..app-deploy/t-eval.gz" "/home/${config[ssh_user]}"

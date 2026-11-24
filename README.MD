@@ -37,4 +37,3 @@ The provisioning script creates a role for our imaginary summer intern named Joh
 
 * `cluster-provision.sh` is not idempotent running the script on the same infrastructure multiple times could break the deployment. This is a possible area of improvement, or a reason to refactor to a utility like Ansible.
 * Johnny is provided with a legacy long-lived cluster authentication token, which is not secure. Providing instructions or a token request script that updates Johnny's kubeconfig for him would solve this. Or adding an identity management utility like Teleport would solve this.
-* (test this for truth) Metallb is not utilized by the current configuration, but is provided for cluster utility completeness.

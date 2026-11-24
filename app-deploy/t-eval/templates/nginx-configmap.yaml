@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: awesomeapp-index
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Super Awesome Demo App</title>
+        <link rel="stylesheet" href="style.css">
+      </head>
+      <body>
+        <h1>This is a super awesome demo app.*</h1>
+        *Imagination Required
+      </body>
+    </html>

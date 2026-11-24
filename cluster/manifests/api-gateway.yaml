@@ -1,0 +1,34 @@
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: clustergateway
+  namespace: kgateway-system
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-ca-issuer
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            kubernetes.io/metadata.name: johnny-droptables
+  - protocol: HTTPS
+    port: 443
+    name: https
+    hostname: awesome.app.johnny
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            kubernetes.io/metadata.name: johnny-droptables
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: awesome-cert
+    

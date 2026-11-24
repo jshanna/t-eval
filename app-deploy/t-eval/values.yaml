@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: nginx
   pullPolicy: IfNotPresent
-  tag: ""
+  tag: 1.28.0
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -21,7 +21,7 @@ podSecurityContext: {}
 securityContext: {}
 
 service:
-  type: NodePort
+  type: ClusterIP
   port: 80
 
 httpRoute:
@@ -29,14 +29,15 @@ httpRoute:
   annotations: {}
   parentRefs:
   - name: clustergateway
-    sectionName: http
+    sectionName: https
     namespace: kgateway-system
   hostnames:
-  - awesome.app
+  - awesome.app.johnny
   rules:
-  - backendRefs:
-    - name: awesomeapp
-      port: 80
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
 
 resources: {}
 
@@ -57,8 +58,9 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 volumes:
-  - name: homepage-host
-    mountPath: ./html
+  - name: homepage
+    configMap:
+      name: awesomeapp-index
 
 volumeMounts:
   - name: homepage
