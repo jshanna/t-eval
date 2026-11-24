@@ -17,13 +17,13 @@ The provisioning script creates a role for our imaginary summer intern named Joh
 ### Pre-requisites
 
 1. 3+ Ubuntu 24.04 Server machines/virtual machines.
-⋅⋅⋅Configured for SSL key authentication, and passwordless `sudo`. (Most Cloud provider's compute instances ship with this configuration)
+    Configured for SSL key authentication, and passwordless `sudo`. (Most Cloud provider's compute instances ship with this configuration)
 
 ### Install
 
 1. Download/Clone this repo.
 2. Edit `kube-deploy/cluster/settings.conf` to conform to your environment. 
-⋅⋅⋅`control_node`, `worker_nodes`, `ssh_user`, and `ssh_key_path` will need to be edited from defaults, other settings will function as is and are provided for customization.
+    `control_node`, `worker_nodes`, `ssh_user`, and `ssh_key_path` will need to be edited from defaults, other settings will function as is and are provided for customization.
 3. Run `kube-deploy/cluster/cluster-provision.sh`
 
 ### Johnny Instructions
@@ -31,18 +31,21 @@ The provisioning script creates a role for our imaginary summer intern named Joh
 1. SSH to the control node machine
 2. Deploy helm chart
 
-⋅⋅⋅`helm install -n johnny-droptables awesome-app t-eval.gz`
+    `helm install -n johnny-droptables awesome-app t-eval.gz`
 
 3. Edit hosts file
 
-⋅⋅⋅Get Gateway public IP
-⋅⋅⋅`kubectl get gateway clustergateway -n kgateway-system -o jsonpath='{.status.addresses[0].value}'`
-⋅⋅⋅Edit host file with the following line replacing <Public IP> with the output of the above command.
-⋅⋅⋅<Public IP>  awesome.app.johnny
+    Get Gateway public IP
+
+    `kubectl get gateway clustergateway -n kgateway-system -o jsonpath='{.status.addresses[0].value}'`
+
+    Edit host file with the following line replacing <Public IP> with the output of the above command.
+    
+    <Public IP>  awesome.app.johnny
 
 4. Check site
 
-⋅⋅⋅Open a browser and direct it to https://awesome.app.johnny The deployment is using a self signed certificate so it will be necessary to take the risk of trusting the site.
+    Open a browser and direct it to https://awesome.app.johnny The deployment is using a self signed certificate so it will be necessary to take the risk of trusting the site.
 
 ## Notes
 
