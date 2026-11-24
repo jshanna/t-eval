@@ -267,4 +267,4 @@ run_ssh_command ${config[control_node]} "rm -f .kube/config"
 run_ssh_command ${config[control_node]} "cp .kube/johnny.config .kube/config"
 
 # Put helm chart on control-node
-sftp_put ${config[control_node]} "..app-deploy/t-eval.gz" "/home/${config[ssh_user]}"
+sftp_put ${config[control_node]} "../app-deploy/t-eval.gz" "/home/${config[ssh_user]}"
