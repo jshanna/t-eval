@@ -17,7 +17,7 @@ The provisioning script creates a role for our imaginary summer intern named Joh
 ### Pre-requisites
 
 1. 3+ Ubuntu 24.04 Server machines/virtual machines.
-    Configured for SSL key authentication, and passwordless `sudo`. (Most Cloud provider's compute instances ship with this configuration)
+    Configured for SSH key authentication, and passwordless `sudo`. (Most Cloud provider's compute instances ship with this configuration)
 
 ### Install
 

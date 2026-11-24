@@ -82,7 +82,7 @@ for node in ${node_array[@]}; do
     done
 
     ## Set sysctl Parameters
-    run_ssh_command $node "sudo touch /etc/sysctl.d/k8s.conf"
+    run_ssh_command $node "sudo touch /etc/sysctl.d/99-k8s.conf"
     for sp in ${SYSCTL_PARAMS[@]}; do
         run_ssh_command $node "sudo sysctl -w $sp"
         run_ssh_command $node "echo $sp | sudo tee -a /etc/sysctl.d/99-k8s.conf"
@@ -91,7 +91,7 @@ for node in ${node_array[@]}; do
 
     # Install Docker
     node_arch=$(run_ssh_command $node 'dpkg --print-architecture')
-    run_ssh_command $node "sudo install -m 07555 -d /etc/apt/keyrings"
+    run_ssh_command $node "sudo install -m 0755 -d /etc/apt/keyrings"
     run_ssh_command $node "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc"
     run_ssh_command $node "sudo chmod a+r /etc/apt/keyrings/docker.asc"
     run_ssh_command $node "echo 'Types: deb' | sudo tee -a /etc/apt/sources.list.d/docker.sources"
@@ -241,18 +241,25 @@ sftp_put ${config[control_node]} "./manifests/johnny-role.yaml" "/home/${config[
 sftp_put ${config[control_node]} "./manifests/johnny-sa.yaml" "/home/${config[ssh_user]}"
 sftp_put ${config[control_node]} "./manifests/johnny-rb.yaml" "/home/${config[ssh_user]}"
 sftp_put ${config[control_node]} "./manifests/johnny-token.yaml" "/home/${config[ssh_user]}"
-sftp_put ${config[control_node]} "./manifests/kubeconfig.template" "/home/${config[ssh_user]}"
+sftp_put ${config[control_node]} "./manifests/johnny-kgateway-read.yaml" "/home/${config[ssh_user]}"
+sftp_put ${config[control_node]} "./manifests/johnny-kgateway-rb.yaml" "/home/${config[ssh_user]}"
 
 run_ssh_command ${config[control_node]} "kubectl create namespace johnny-droptables"
 run_ssh_command ${config[control_node]} "kubectl apply -f api-http-redirect.yaml"
 run_ssh_command ${config[control_node]} "kubectl apply -f johnny-role.yaml"
 run_ssh_command ${config[control_node]} "kubectl apply -f johnny-sa.yaml"
 run_ssh_command ${config[control_node]} "kubectl apply -f johnny-rb.yaml"
+run_ssh_command ${config[control_node]} "kubectl apply -f johnny-kgateway-read.yaml"
+run_ssh_command ${config[control_node]} "kubectl apply -f johnny-kgateway-rb.yaml"
 run_ssh_command ${config[control_node]} "kubectl apply -f johnny-token.yaml"
 
 johnny_token=$(run_ssh_command ${config[control_node]} "kubectl get secret johnny-not-secure-token -n johnny-droptables -o jsonpath='{.data.token}' | base64 --decode")
-run_ssh_command ${config[control_node]} "sed \"s/<CP_IP>/${config[control_node]}/g\" kubeconfig.template > .kube/johnny.config"
-run_ssh_command ${config[control_node]} "sed -i \"s/<TOKEN>/$johnny_token/g\" .kube/johnny.config"
+kube_config="--kubeconfig=.kube/johnny.config"
+run_ssh_command ${config[control_node]} "kubectl config $kube_config set-cluster kubernetes --server=https://${config[control_node]}:6443 --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true"
+run_ssh_command ${config[control_node]} "kubectl config $kube_config set-credentials johnny-d-sa --token=$johnny_token"
+run_ssh_command ${config[control_node]} "kubectl config $kube_config set-context johnny-d-sa-context --cluster=kubernetes --namespace=johnny-droptables --user=johnny-d-sa"
+run_ssh_command ${config[control_node]} "kubectl config $kube_config use-context johnny-d-sa-context"
+run_ssh_command ${config[control_node]} "chmod 600 .kube/johnny.config"
 
 # "Lock" Johnny out of admin
 run_ssh_command ${config[control_node]} "mv .kube/config .kube/config.bak"

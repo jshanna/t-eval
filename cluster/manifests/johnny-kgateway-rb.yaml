@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: johnny-gateway-read
+  namespace: kgateway-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: johnny-gateway-read
+subjects:
+  - kind: ServiceAccount
+    name: johnny-d-sa
+    namespace: johnny-droptables
