@@ -39,9 +39,9 @@ The provisioning script creates a role for our imaginary summer intern named Joh
 
     `kubectl get gateway clustergateway -n kgateway-system -o jsonpath='{.status.addresses[0].value}'`
 
-    Edit host file with the following line replacing <Public IP> with the output of the above command.
-    
-    <Public IP>  awesome.app.johnny
+    Edit host file with the following line replacing PublicIP with the output of the above command.
+
+    PublicIP  awesome.app.johnny
 
 4. Check site
 
