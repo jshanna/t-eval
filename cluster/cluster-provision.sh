@@ -254,5 +254,10 @@ johnny_token=$(run_ssh_command ${config[control_node]} "kubectl get secret johnn
 run_ssh_command ${config[control_node]} "sed \"s/<CP_IP>/${config[control_node]}/g\" kubeconfig.template > .kube/johnny.config"
 run_ssh_command ${config[control_node]} "sed -i \"s/<TOKEN>/$johnny_token/g\" .kube/johnny.config"
 
+# "Lock" Johnny out of admin
+run_ssh_command ${config[control_node]} "mv .kube/config .kube/config.bak"
+run_ssh_command ${config[control_node]} "rm -f .kube/config"
+run_ssh_command ${config[control_node]} "cp .kube/johnny.config .kube/config"
+
 # Put helm chart on control-node
 sftp_put ${config[control_node]} "..app-deploy/t-eval.gz" "/home/${config[ssh_user]}"
