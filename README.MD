@@ -30,8 +30,14 @@ The provisioning script creates a role for our imaginary summer intern named Joh
 
 1. SSH to the control node machine
 2. Deploy helm chart
+---`helm install -n johnny-droptables awesome-app t-eval.gz`
 3. Edit hosts file
+---Get Gateway public IP
+---`kubectl get gateway clustergateway -n kgateway-system -o jsonpath='{.status.addresses[0].value}'`
+---Edit host file with the following line replacing <Public IP> with the output of the above command.
+---<Public IP>  awesome.app.johnny
 4. Check site
+---Open a browser and direct it to https://awesome.app.johnny The deployment is using a self signed certificate so it will be necessary to take the risk of trusting the site.
 
 ## Notes
 
